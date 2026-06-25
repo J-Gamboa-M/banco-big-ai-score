@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>AI Score — Definição e Metodologia</title>
+<script>
+(function(){
+  var k = sessionStorage.getItem('aok');
+  if(k !== '1'){
+    var p = prompt('Password:');
+    if(p !== 'gamboa1234'){ document.addEventListener('DOMContentLoaded', function(){ document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#888;">Acesso negado.</div>'; }); }
+    else { sessionStorage.setItem('aok','1'); }
+  }
+})();
+</script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700&family=Inter:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: #E8E8E8; }
+  body {
+    font-family: 'Inter', sans-serif; font-size: 12px; color: #1A1A1A;
+    background: #E8E8E8; display: flex; justify-content: center; padding: 40px 20px;
+  }
+  .page {
+    width: 794px; background: #FFFFFF; padding: 48px 52px;
+    display: flex; flex-direction: column; gap: 36px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+  }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 20px; border-bottom: 1px solid #EAEAEA; }
+  .logo-lockup { display: flex; align-items: center; gap: 8px; }
+  .logo-wordmark { font-family: 'Inter Tight', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: -0.03em; color: #0A0A0A; }
+  .header-meta { text-align: right; }
+  .eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #B5B5B5; margin-bottom: 2px; }
+  .project-label { font-size: 11px; font-weight: 500; color: #6E6E6E; }
+  .title-block h1 { font-family: 'Inter Tight', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.03em; color: #0A0A0A; }
+  .title-block p { margin-top: 6px; font-size: 12px; color: #6E6E6E; }
+  .section-eyebrow { font-size: 9.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #B5B5B5; margin-bottom: 10px; }
+  .definition-pill { display: block; padding: 12px 16px; background: #FAFAFA; border: 1px solid #EAEAEA; border-radius: 8px; font-size: 11.5px; color: #5E5E5E; line-height: 1.65; }
+
+  /* APPROACHES */
+  .approaches-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .approach { background: #FAFAFA; border: 1px solid #EAEAEA; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
+  .approach.chosen { border: 1.5px solid #0A0A0A; }
+  .approach-header { padding: 12px 14px 10px; border-bottom: 1px solid #EAEAEA; }
+  .approach.chosen .approach-header { background: #0A0A0A; }
+  .approach-tag { font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #B5B5B5; margin-bottom: 3px; }
+  .approach.chosen .approach-tag { color: #6E6E6E; }
+  .approach-name { font-family: 'Inter Tight', sans-serif; font-size: 13px; font-weight: 700; color: #0A0A0A; }
+  .approach.chosen .approach-name { color: #F5F5F5; }
+  .chosen-badge { display: inline-block; margin-top: 5px; padding: 2px 7px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 3px; font-size: 8.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #F5F5F5; }
+  .approach-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+  .block-label { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #B5B5B5; margin-bottom: 4px; }
+  .bullet { display: flex; gap: 6px; align-items: flex-start; font-size: 10.5px; color: #1A1A1A; line-height: 1.5; margin-bottom: 3px; }
+  .bullet .mark { font-weight: 700; flex-shrink: 0; }
+  .bullet.con { color: #5E5E5E; }
+  .bullet.con .mark { color: #8A8A8A; }
+  .failure-example { margin-top: auto; padding: 7px 10px; background: #F2F2F2; border-radius: 5px; }
+  .failure-label { font-size: 8.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #B5B5B5; margin-bottom: 3px; }
+  .failure-text { font-size: 10px; color: #5E5E5E; line-height: 1.5; font-style: italic; }
+
+  /* FLOW */
+  .flow { display: flex; align-items: stretch; background: #FAFAFA; border: 1px solid #EAEAEA; border-radius: 10px; overflow: hidden; }
+  .flow-col { flex: 1; padding: 14px 16px; border-right: 1px solid #EAEAEA; display: flex; flex-direction: column; gap: 5px; }
+  .flow-col:last-child { border-right: none; }
+  .flow-col-label { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #B5B5B5; margin-bottom: 4px; }
+  .flow-item { font-size: 10px; color: #5E5E5E; padding: 3px 7px; background: #EFEFEF; border-radius: 4px; }
+  .flow-arrow { display: flex; align-items: center; padding: 0 6px; font-size: 14px; color: #B5B5B5; flex-shrink: 0; }
+  .flow-output { background: #0A0A0A; padding: 14px 18px; display: flex; flex-direction: column; justify-content: center; align-items: center; min-width: 90px; flex-shrink: 0; }
+  .flow-output-score { font-family: 'Inter Tight', sans-serif; font-size: 22px; font-weight: 700; color: #F5F5F5; }
+  .flow-output-sub { font-size: 9px; color: #6E6E6E; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* CHARTS */
+  .charts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .chart-card { background: #FAFAFA; border: 1px solid #EAEAEA; border-radius: 8px; padding: 12px 14px 10px; display: flex; flex-direction: column; gap: 6px; }
+  .chart-body { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .chart-header { display: flex; justify-content: space-between; align-items: baseline; }
+  .chart-dim { font-family: 'Inter Tight', sans-serif; font-size: 11px; font-weight: 700; color: #0A0A0A; }
+  .chart-max { font-size: 9.5px; font-weight: 600; color: #B5B5B5; }
+  .chart-source { font-size: 9px; color: #B5B5B5; }
+  table.mtx { width: 100%; border-collapse: collapse; font-size: 9px; margin-top: 6px; }
+  table.mtx th { font-size: 7px; font-weight: 600; color: #8A8A8A; text-align: center; padding: 3px 2px; background: #F2F2F2; border-bottom: none; letter-spacing: 0; text-transform: none; }
+  table.mtx td { font-family: 'Inter Tight', sans-serif; font-size: 9px; font-weight: 700; text-align: center; padding: 4px 2px; border-bottom: none; }
+  table.mtx .mtx-row { font-family: 'Inter', sans-serif; font-size: 7px; font-weight: 600; color: #5E5E5E; background: #F2F2F2; text-align: left; padding: 4px 4px 4px 5px; white-space: nowrap; }
+  .mtx-note { font-size: 7px; color: #C0C0C0; margin-top: 4px; }
+
+  /* EXAMPLES */
+  .examples-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .example-card { background: #FAFAFA; border: 1px solid #EAEAEA; border-radius: 10px; overflow: hidden; }
+  .example-header { padding: 12px 14px 10px; border-bottom: 1px solid #EAEAEA; display: flex; justify-content: space-between; align-items: flex-start; }
+  .example-name { font-family: 'Inter Tight', sans-serif; font-size: 11.5px; font-weight: 700; color: #0A0A0A; }
+  .example-company { font-size: 10px; color: #6E6E6E; margin-top: 2px; }
+  .example-score { font-family: 'Inter Tight', sans-serif; font-size: 26px; font-weight: 700; color: #0A0A0A; line-height: 1; text-align: right; }
+  .example-score-label { font-size: 8.5px; color: #B5B5B5; text-align: right; margin-top: 2px; }
+  .example-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 3px; }
+  .example-row { display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: #5E5E5E; padding: 2px 0; border-bottom: 1px solid #F5F5F5; }
+  .example-row-pts { font-family: 'Inter Tight', sans-serif; font-weight: 700; color: #0A0A0A; font-size: 10.5px; white-space: nowrap; margin-left: 6px; }
+  .example-total { margin-top: 6px; padding-top: 6px; border-top: 1px solid #EAEAEA; display: flex; justify-content: space-between; align-items: center; }
+  .example-total-label { font-size: 10px; font-weight: 600; color: #0A0A0A; }
+  .example-total-pts { font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 14px; color: #0A0A0A; }
+
+  .footer { padding-top: 16px; border-top: 1px solid #EAEAEA; display: flex; justify-content: space-between; align-items: center; }
+  .footer-label { font-size: 10px; color: #B5B5B5; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo-lockup">
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="27" viewBox="0 0 5457 11248" fill="none">
+        <path fill="#0A0A0A" fill-rule="evenodd" d="M3019.1 120.02c-160.02-160.026-419.46-160.026-579.47-.001L121.739 2438.04c-160.017 160.03-160.017 419.48 0 579.51l867.243 867.29c160.018 160.02 160.018 419.48 0 579.5l-868.969 869.02c-160.017 160.03-160.017 419.48 0 579.51l868.989 869.04c160.018 160.03 160.018 419.48 0 579.5l-868.989 869.04c-160.017 160.03-160.017 419.48 0 579.51L2437.9 11128c160.02 160 419.46 160 579.47 0l2317.89-2318.04c160.02-160.03 160.02-419.48 0-579.51l-868.99-869.04c-160.01-160.02-160.01-419.47 0-579.5l868.99-869.04c160.02-160.03 160.02-419.48 0-579.51l-867.24-867.29c-160.02-160.03-160.02-419.48 0-579.5l868.97-869.02c160.01-160.03 160.01-419.48 0-579.51L3019.1 120.02Zm-581.74 2897.09c160.02-160.03 419.46-160.03 579.47 0l869.21 869.26c160.02 160.03 160.02 419.48 0 579.5l-869.21 869.26c-160.01 160.03-419.45 160.03-579.47 0l-869.21-869.26c-160.01-160.02-160.01-419.47 0-579.5l869.21-869.26Zm0 2897.09c160.02-160.03 419.46-160.03 579.47 0l869.21 869.26c160.02 160.02 160.02 419.48 0 579.5l-869.21 869.26c-160.01 160.03-419.45 160.03-579.47 0l-869.21-869.26c-160.01-160.02-160.01-419.48 0-579.5l869.21-869.26Z" clip-rule="evenodd"/>
+      </svg>
+      <span class="logo-wordmark">Augusta Labs</span>
+    </div>
+    <div class="header-meta">
+      <div class="eyebrow">Análise Interna</div>
+      <div class="project-label">Augusta Labs x Banco BiG · UC1: AI Score</div>
+    </div>
+  </div>
+
+  <!-- TITLE -->
+  <div class="title-block">
+    <h1>AI Score — Definição e Metodologia</h1>
+    <p>Definição, comparação de abordagens, arquitectura seleccionada e exemplos reais.</p>
+  </div>
+
+  <!-- 01: DEFINIÇÃO -->
+  <div>
+    <div class="section-eyebrow">01 · O Que Mede</div>
+    <div class="definition-pill">
+      O <strong style="color:#0A0A0A;">AI Score</strong> é um indicador que expressa a probabilidade de um cliente enquadrar-se como <strong style="color:#0A0A0A;">Ideal Customer Profile (ICP)</strong> do Banco BiG, um cliente com maior potencial para extrair o máximo valor dos produtos e serviços do banco e, consequentemente, gerar o maior <em>lifetime value</em> (LTV).<br><br>Calculado por soma ponderada de 4 matrizes combinadas e 2 curvas independentes, numa escala de 0 a 100.
+    </div>
+    <div style="margin-top:14px;">
+      <div style="font-size:9px; color:#B5B5B5; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:7px;">Escala de Interpretação</div>
+      <div style="display:flex; border-radius:6px; overflow:hidden; height:36px;">
+        <div style="flex:1.5; background:#0A0A0A; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div style="font-family:'Inter Tight',sans-serif; font-size:9px; font-weight:700; color:#F5F5F5;">80–100</div>
+          <div style="font-size:8px; color:#8A8A8A; margin-top:1px;">Muito Elevado</div>
+        </div>
+        <div style="flex:1; background:#2A2A2A; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div style="font-family:'Inter Tight',sans-serif; font-size:9px; font-weight:700; color:#F5F5F5;">60–79</div>
+          <div style="font-size:8px; color:#8A8A8A; margin-top:1px;">Elevado</div>
+        </div>
+        <div style="flex:1; background:#6E6E6E; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div style="font-family:'Inter Tight',sans-serif; font-size:9px; font-weight:700; color:#F5F5F5;">40–59</div>
+          <div style="font-size:8px; color:#DADADA; margin-top:1px;">Médio</div>
+        </div>
+        <div style="flex:1; background:#B5B5B5; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div style="font-family:'Inter Tight',sans-serif; font-size:9px; font-weight:700; color:#F5F5F5;">20–39</div>
+          <div style="font-size:8px; color:#F5F5F5; margin-top:1px;">Reduzido</div>
+        </div>
+        <div style="flex:1; background:#E8E8E8; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div style="font-family:'Inter Tight',sans-serif; font-size:9px; font-weight:700; color:#6E6E6E;">0–19</div>
+          <div style="font-size:8px; color:#B5B5B5; margin-top:1px;">Muito Reduzido</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02: ABORDAGENS -->
+  <div>
+    <div class="section-eyebrow">02 · Abordagens Consideradas</div>
+    <div class="approaches-grid">
+
+      <div class="approach">
+        <div class="approach-header">
+          <div class="approach-tag">Abordagem A</div>
+          <div class="approach-name">Determinística</div>
+        </div>
+        <div class="approach-body">
+          <div>
+            <div class="block-label">Prós</div>
+            <div class="bullet"><span class="mark">+</span>Score totalmente auditável e reproduzível</div>
+            <div class="bullet"><span class="mark">+</span>Simples de implementar</div>
+          </div>
+          <div>
+            <div class="block-label">Contras</div>
+            <div class="bullet con"><span class="mark">−</span>Mapeamento manual de cargos e empresas é exaustivo e fica obsoleto rapidamente</div>
+          </div>
+          <div class="failure-example">
+            <div class="failure-label">Exemplo de falha</div>
+            <div class="failure-text">"Chief Revenue Officer, Iberia" não existe no dicionário → 0 pts de senioridade para um perfil C-Suite.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="approach">
+        <div class="approach-header">
+          <div class="approach-tag">Abordagem B</div>
+          <div class="approach-name">LLM Puro</div>
+        </div>
+        <div class="approach-body">
+          <div>
+            <div class="block-label">Prós</div>
+            <div class="bullet"><span class="mark">+</span>Raciocina sobre o perfil como um todo</div>
+            <div class="bullet"><span class="mark">+</span>Lida nativamente com texto livre</div>
+          </div>
+          <div>
+            <div class="block-label">Contras</div>
+            <div class="bullet con"><span class="mark">−</span>Não determinístico entre execuções</div>
+            <div class="bullet con"><span class="mark">−</span>Inauditável para instituição regulada</div>
+            <div class="bullet con"><span class="mark">−</span>Score muda com actualizações do modelo</div>
+          </div>
+          <div class="failure-example">
+            <div class="failure-label">Exemplo de falha</div>
+            <div class="failure-text">O mesmo perfil recebe 72 pts numa execução e 58 pts na seguinte, após actualização do modelo.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="approach chosen">
+        <div class="approach-header">
+          <div class="approach-tag">Abordagem C</div>
+          <div class="approach-name">Híbrida</div>
+          <div class="chosen-badge">Seleccionada</div>
+        </div>
+        <div class="approach-body">
+          <div>
+            <div class="block-label">Prós</div>
+            <div class="bullet"><span class="mark">+</span>Prós da Determinística e do LLM Puro</div>
+            <div class="bullet"><span class="mark">+</span>Curvas calibráveis à medida que dados reais acumulam</div>
+          </div>
+          <div>
+            <div class="block-label">Contras</div>
+            <div class="bullet con"><span class="mark">−</span>Erros do LLM propagam-se silenciosamente para as curvas</div>
+            <div class="bullet con"><span class="mark">−</span>Dois sistemas a versionar</div>
+          </div>
+          <div class="failure-example">
+            <div class="failure-label">Exemplo de falha</div>
+            <div class="failure-text">Engenheiro na Stripe classificado como Tech em vez de Finance. Perde 12 pts na matriz de indústria.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 03: ARQUITECTURA -->
+  <div>
+    <div class="section-eyebrow">03 · Arquitectura da Abordagem Híbrida</div>
+    <div style="display:flex; align-items:stretch; gap:0;">
+
+      <div style="flex:1; background:#FAFAFA; border:1px solid #EAEAEA; border-radius:8px; padding:12px 12px 12px; display:flex; flex-direction:column; gap:8px;">
+        <div>
+          <div style="font-size:8px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#D0D0D0; margin-bottom:3px;">01</div>
+          <div style="font-family:'Inter Tight',sans-serif; font-size:11px; font-weight:700; color:#0A0A0A;">CRM Interno</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:3px; flex:1; justify-content:flex-start;">
+          <div class="flow-item" style="font-size:9px; padding:2px 6px;">Cargo</div>
+          <div class="flow-item" style="font-size:9px; padding:2px 6px;">Empresa</div>
+          <div class="flow-item" style="font-size:9px; padding:2px 6px;">Idade</div>
+          <div class="flow-item" style="font-size:9px; padding:2px 6px;">Localidade</div>
+          <div class="flow-item" style="font-size:9px; padding:2px 6px;">Perfil</div>
+          <div class="flow-item" style="font-size:9px; padding:2px 6px;">Antiguidade</div>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; padding:0 8px; color:#C8C8C8; font-size:13px; flex-shrink:0;">→</div>
+
+      <div style="flex:1; background:#FAFAFA; border:1px solid #EAEAEA; border-radius:8px; padding:12px 12px 12px; display:flex; flex-direction:column; gap:8px;">
+        <div>
+          <div style="font-size:8px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#D0D0D0; margin-bottom:3px;">02</div>
+          <div style="font-family:'Inter Tight',sans-serif; font-size:11px; font-weight:700; color:#0A0A0A;">LinkedIn Enrichment</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:3px; flex:1; justify-content:flex-start;">
+          <div class="flow-item" style="font-size:9px; padding:2px 6px;">LinkedIn presente</div>
+          <div class="flow-item" style="font-size:9px; padding:2px 6px;">Anos de experiência</div>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; padding:0 8px; color:#C8C8C8; font-size:13px; flex-shrink:0;">→</div>
+
+      <div style="flex:1; background:#FAFAFA; border:1px solid #EAEAEA; border-radius:8px; padding:12px 12px 12px; display:flex; flex-direction:column; gap:8px;">
+        <div>
+          <div style="font-size:8px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#D0D0D0; margin-bottom:3px;">03</div>
+          <div style="font-family:'Inter Tight',sans-serif; font-size:11px; font-weight:700; color:#0A0A0A;">LLM</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:3px; flex:1; justify-content:flex-start;">
+          <div class="flow-item" style="font-size:9px; padding:2px 6px;">"Chief Executive Officer" → <strong>c_suite</strong></div>
+          <div class="flow-item" style="font-size:9px; padding:2px 6px;">"McKinsey &amp; Co" → <strong>multinacional · consulting</strong></div>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; padding:0 8px; color:#C8C8C8; font-size:13px; flex-shrink:0;">→</div>
+
+      <div style="flex:1; background:#FAFAFA; border:1px solid #EAEAEA; border-radius:8px; padding:12px 12px 12px; display:flex; flex-direction:column; gap:8px;">
+        <div>
+          <div style="font-size:8px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#D0D0D0; margin-bottom:3px;">04</div>
+          <div style="font-family:'Inter Tight',sans-serif; font-size:11px; font-weight:700; color:#0A0A0A;">Curvas de Pontuação</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:3px; flex:1; justify-content:flex-start;">
+          <div class="flow-item" style="font-size:9px; padding:2px 6px;">4 matrizes combinadas</div>
+          <div class="flow-item" style="font-size:9px; padding:2px 6px;">2 curvas independentes</div>
+          <div class="flow-item" style="font-size:9px; padding:2px 6px;">Pesos fixos por regra</div>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; padding:0 8px; color:#C8C8C8; font-size:13px; flex-shrink:0;">→</div>
+
+      <div style="flex:1; background:#0A0A0A; border-radius:8px; padding:12px 12px 12px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
+        <div style="font-size:8px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#4A4A4A;">05</div>
+        <div style="font-size:18px; font-weight:700; color:#6E6E6E; line-height:1;">Σ</div>
+        <div style="font-family:'Inter Tight',sans-serif; font-size:15px; font-weight:700; color:#F5F5F5; line-height:1.1; text-align:center;">AI Score</div>
+        <div style="font-size:9px; color:#4A4A4A; text-transform:uppercase; letter-spacing:0.08em;">0 – 100</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 04: DIMENSÕES E CURVAS DE PONTUAÇÃO -->
+  <div>
+    <div class="section-eyebrow">04 · Dimensões e Curvas de Pontuação</div>
+
+    <!-- MATRIZES COMBINADAS -->
+    <div class="charts-grid" style="margin-bottom:10px;">
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="chart-dim">Cargo × Anos Experiência</span>
+          <span class="chart-max">máx 35 pts</span>
+        </div>
+        <div class="chart-body">
+        <table class="mtx">
+          <thead><tr>
+            <th class="mtx-row"></th>
+            <th>&lt;3a</th><th>3–7a</th><th>7–15a</th><th>&gt;15a</th>
+            <th style="border-left:1px solid #E0E0E0; color:#C0C0C0; font-style:italic;">n/d</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td class="mtx-row">Junior</td>
+              <td style="background:#EDEDED;color:#3A3A3A">2</td>
+              <td style="background:#EDEDED;color:#3A3A3A">4</td>
+              <td style="background:#EDEDED;color:#3A3A3A">6</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">7</td>
+              <td style="background:#F5F5F5;color:#C0C0C0;border-left:1px solid #E0E0E0;font-style:italic;">2</td>
+            </tr>
+            <tr>
+              <td class="mtx-row">Manager</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">7</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">12</td>
+              <td style="background:#8A8A8A;color:#F5F5F5">18</td>
+              <td style="background:#4A4A4A;color:#F5F5F5">22</td>
+              <td style="background:#F5F5F5;color:#C0C0C0;border-left:1px solid #E0E0E0;font-style:italic;">7</td>
+            </tr>
+            <tr>
+              <td class="mtx-row">VP/Dir.</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">13</td>
+              <td style="background:#8A8A8A;color:#F5F5F5">18</td>
+              <td style="background:#4A4A4A;color:#F5F5F5">25</td>
+              <td style="background:#1A1A1A;color:#F5F5F5">29</td>
+              <td style="background:#F5F5F5;color:#C0C0C0;border-left:1px solid #E0E0E0;font-style:italic;">13</td>
+            </tr>
+            <tr>
+              <td class="mtx-row">C-Suite</td>
+              <td style="background:#8A8A8A;color:#F5F5F5">20</td>
+              <td style="background:#4A4A4A;color:#F5F5F5">25</td>
+              <td style="background:#1A1A1A;color:#F5F5F5">31</td>
+              <td style="background:#0A0A0A;color:#F5F5F5">35</td>
+              <td style="background:#F5F5F5;color:#C0C0C0;border-left:1px solid #E0E0E0;font-style:italic;">20</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="mtx-note">n/d = anos de exp. desconhecidos</div>
+        <div class="mtx-note">Cargo desconhecido = 0</div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="chart-dim">Indústria × Tier Empresa</span>
+          <span class="chart-max">máx 25 pts</span>
+        </div>
+        <div class="chart-body">
+        <table class="mtx">
+          <thead><tr>
+            <th class="mtx-row"></th>
+            <th>PME</th><th>Nacional</th><th>Multi.</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td class="mtx-row">Outro</td>
+              <td style="background:#EDEDED;color:#3A3A3A">1</td>
+              <td style="background:#EDEDED;color:#3A3A3A">3</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">6</td>
+            </tr>
+            <tr>
+              <td class="mtx-row">Tech</td>
+              <td style="background:#EDEDED;color:#3A3A3A">4</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">8</td>
+              <td style="background:#8A8A8A;color:#F5F5F5">13</td>
+            </tr>
+            <tr>
+              <td class="mtx-row">Consulting</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">6</td>
+              <td style="background:#8A8A8A;color:#F5F5F5">11</td>
+              <td style="background:#4A4A4A;color:#F5F5F5">17</td>
+            </tr>
+            <tr>
+              <td class="mtx-row">Finance</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">9</td>
+              <td style="background:#4A4A4A;color:#F5F5F5">16</td>
+              <td style="background:#0A0A0A;color:#F5F5F5">25</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="mtx-note">Desconhecida = 0</div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="chart-dim">Perfil Inv. × Antiguidade</span>
+          <span class="chart-max">máx 15 pts</span>
+        </div>
+        <div class="chart-body">
+        <table class="mtx">
+          <thead><tr>
+            <th class="mtx-row"></th>
+            <th>&lt;1a</th><th>1–3a</th><th>3–7a</th><th>&gt;7a</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td class="mtx-row">Conserv.</td>
+              <td style="background:#EDEDED;color:#3A3A3A">1</td>
+              <td style="background:#EDEDED;color:#3A3A3A">2</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">3</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">4</td>
+            </tr>
+            <tr>
+              <td class="mtx-row">Moderado</td>
+              <td style="background:#EDEDED;color:#3A3A3A">2</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">4</td>
+              <td style="background:#8A8A8A;color:#F5F5F5">6</td>
+              <td style="background:#8A8A8A;color:#F5F5F5">9</td>
+            </tr>
+            <tr>
+              <td class="mtx-row">Dinâmico</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">4</td>
+              <td style="background:#8A8A8A;color:#F5F5F5">7</td>
+              <td style="background:#4A4A4A;color:#F5F5F5">11</td>
+              <td style="background:#0A0A0A;color:#F5F5F5">15</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="mtx-note">Desconhecido = 0</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CURVAS INDEPENDENTES -->
+    <div class="charts-grid">
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="chart-dim">Idade</span>
+          <span class="chart-max">máx 10 pts</span>
+        </div>
+        <div class="chart-body">
+        <svg width="100%" viewBox="0 0 200 105" preserveAspectRatio="xMidYMid meet">
+          <line x1="0" y1="75" x2="200" y2="75" stroke="#EAEAEA" stroke-width="0.5"/>
+          <rect x="4"   y="60"   width="20" height="15"   fill="#0A0A0A" rx="1"/>
+          <rect x="32"  y="37.5" width="20" height="37.5" fill="#0A0A0A" rx="1"/>
+          <rect x="60"  y="15"   width="20" height="60"   fill="#0A0A0A" rx="1"/>
+          <rect x="88"  y="0"    width="20" height="75"   fill="#0A0A0A" rx="1"/>
+          <rect x="116" y="15"   width="20" height="60"   fill="#0A0A0A" rx="1"/>
+          <rect x="144" y="37.5" width="20" height="37.5" fill="#0A0A0A" rx="1"/>
+          <rect x="172" y="60"   width="20" height="15"   fill="#0A0A0A" rx="1"/>
+          <text x="98"  y="12"   font-family="Inter" font-size="7" fill="#FFFFFF" text-anchor="middle">10</text>
+          <text x="14"  y="90" font-family="Inter" font-size="7" fill="#8A8A8A" text-anchor="middle">&lt;25</text>
+          <text x="42"  y="90" font-family="Inter" font-size="7" fill="#8A8A8A" text-anchor="middle">25-34</text>
+          <text x="70"  y="90" font-family="Inter" font-size="7" fill="#8A8A8A" text-anchor="middle">35-44</text>
+          <text x="98"  y="90" font-family="Inter" font-size="7" fill="#8A8A8A" text-anchor="middle">45-55</text>
+          <text x="126" y="90" font-family="Inter" font-size="7" fill="#8A8A8A" text-anchor="middle">56-65</text>
+          <text x="154" y="90" font-family="Inter" font-size="7" fill="#8A8A8A" text-anchor="middle">66-75</text>
+          <text x="182" y="90" font-family="Inter" font-size="7" fill="#8A8A8A" text-anchor="middle">&gt;75</text>
+        </svg>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="chart-dim">País × Localidade</span>
+          <span class="chart-max">máx 10 pts</span>
+        </div>
+        <div class="chart-body">
+        <table class="mtx">
+          <thead><tr>
+            <th class="mtx-row"></th>
+            <th>Metrópole</th><th>Outra</th><th>Interior</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td class="mtx-row">Portugal</td>
+              <td style="background:#0A0A0A;color:#F5F5F5">10</td>
+              <td style="background:#4A4A4A;color:#F5F5F5">7</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">4</td>
+            </tr>
+            <tr>
+              <td class="mtx-row">UK</td>
+              <td style="background:#4A4A4A;color:#F5F5F5">7</td>
+              <td style="background:#8A8A8A;color:#F5F5F5">5</td>
+              <td style="background:#EDEDED;color:#3A3A3A">2</td>
+            </tr>
+            <tr>
+              <td class="mtx-row">Espanha</td>
+              <td style="background:#8A8A8A;color:#F5F5F5">6</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">4</td>
+              <td style="background:#EDEDED;color:#3A3A3A">2</td>
+            </tr>
+            <tr>
+              <td class="mtx-row">Alemanha</td>
+              <td style="background:#8A8A8A;color:#F5F5F5">5</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">3</td>
+              <td style="background:#EDEDED;color:#3A3A3A">1</td>
+            </tr>
+            <tr>
+              <td class="mtx-row">Itália</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">4</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">3</td>
+              <td style="background:#EDEDED;color:#3A3A3A">1</td>
+            </tr>
+            <tr>
+              <td class="mtx-row">Outro</td>
+              <td style="background:#C8C8C8;color:#1A1A1A">3</td>
+              <td style="background:#EDEDED;color:#3A3A3A">2</td>
+              <td style="background:#EDEDED;color:#3A3A3A">0</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="mtx-note">LX/Porto/CS = Metrópole · Desconhecida = 0</div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="chart-dim">LinkedIn Presente</span>
+          <span class="chart-max">máx 5 pts</span>
+        </div>
+        <div class="chart-body">
+        <svg width="100%" viewBox="0 0 200 105" preserveAspectRatio="xMidYMid meet">
+          <line x1="0" y1="75" x2="200" y2="75" stroke="#EAEAEA" stroke-width="0.5"/>
+          <rect x="40"  y="74" width="50" height="1"  fill="#EAEAEA" rx="1"/>
+          <rect x="110" y="0"  width="50" height="75" fill="#0A0A0A" rx="1"/>
+          <text x="65"  y="70" font-family="Inter" font-size="7.5" fill="#C0C0C0" text-anchor="middle">0</text>
+          <text x="135" y="12" font-family="Inter" font-size="7"   fill="#FFFFFF"  text-anchor="middle">5</text>
+          <text x="65"  y="90" font-family="Inter" font-size="7.5" fill="#8A8A8A" text-anchor="middle">Não</text>
+          <text x="135" y="90" font-family="Inter" font-size="7.5" fill="#8A8A8A" text-anchor="middle">Sim</text>
+        </svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 05: EXEMPLOS -->
+  <div>
+    <div class="section-eyebrow">05 · Exemplos Concretos</div>
+    <div class="examples-grid">
+
+      <div class="example-card">
+        <div class="example-header">
+          <div>
+            <div class="example-name">Henrique Guerreiro</div>
+            <div class="example-company">McKinsey &amp; Company</div>
+          </div>
+          <div>
+            <div class="example-score">80</div>
+            <div class="example-score-label">Muito Elevado</div>
+          </div>
+        </div>
+        <div class="example-body">
+          <div class="example-row"><span>Cargo × Exp (VP/Dir. × &gt;15a)</span><span class="example-row-pts">29 / 35</span></div>
+          <div class="example-row"><span>Ind. × Tier (Consulting × Multi.)</span><span class="example-row-pts">17 / 25</span></div>
+          <div class="example-row"><span>Perfil × Antig. (Dinâmico × 3-7a)</span><span class="example-row-pts">11 / 15</span></div>
+          <div class="example-row"><span>Idade (35-44 anos)</span><span class="example-row-pts">8 / 10</span></div>
+          <div class="example-row"><span>País × Local. (PT × Metrópole)</span><span class="example-row-pts">10 / 10</span></div>
+          <div class="example-row"><span>LinkedIn (encontrado)</span><span class="example-row-pts">5 / 5</span></div>
+          <div class="example-total">
+            <span class="example-total-label">Total</span>
+            <span class="example-total-pts">80 / 100</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="example-card">
+        <div class="example-header">
+          <div>
+            <div class="example-name">Telma Alves</div>
+            <div class="example-company">FindYou Consulting</div>
+          </div>
+          <div>
+            <div class="example-score">40</div>
+            <div class="example-score-label">Médio</div>
+          </div>
+        </div>
+        <div class="example-body">
+          <div class="example-row"><span>Cargo × Exp (Manager × 3-7a)</span><span class="example-row-pts">12 / 35</span></div>
+          <div class="example-row"><span>Ind. × Tier (Consulting × PME)</span><span class="example-row-pts">6 / 25</span></div>
+          <div class="example-row"><span>Perfil × Antig. (Conserv. × 1-3a)</span><span class="example-row-pts">2 / 15</span></div>
+          <div class="example-row"><span>Idade (25-34 anos)</span><span class="example-row-pts">5 / 10</span></div>
+          <div class="example-row"><span>País × Local. (PT × Metrópole)</span><span class="example-row-pts">10 / 10</span></div>
+          <div class="example-row"><span>LinkedIn (encontrado)</span><span class="example-row-pts">5 / 5</span></div>
+          <div class="example-total">
+            <span class="example-total-label">Total</span>
+            <span class="example-total-pts">40 / 100</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="example-card">
+        <div class="example-header">
+          <div>
+            <div class="example-name">José Gama</div>
+            <div class="example-company">Mercearia Central</div>
+          </div>
+          <div>
+            <div class="example-score">24</div>
+            <div class="example-score-label">Reduzido</div>
+          </div>
+        </div>
+        <div class="example-body">
+          <div class="example-row"><span>Cargo × Exp (Junior × n/d)</span><span class="example-row-pts">2 / 35</span></div>
+          <div class="example-row"><span>Ind. × Tier (Outro × PME)</span><span class="example-row-pts">1 / 25</span></div>
+          <div class="example-row"><span>Perfil × Antig. (Conserv. × &lt;1a)</span><span class="example-row-pts">1 / 15</span></div>
+          <div class="example-row"><span>Idade (45-55 anos)</span><span class="example-row-pts">10 / 10</span></div>
+          <div class="example-row"><span>País × Local. (PT × Metrópole)</span><span class="example-row-pts">10 / 10</span></div>
+          <div class="example-row"><span>LinkedIn (não encontrado)</span><span class="example-row-pts">0 / 5</span></div>
+          <div class="example-total">
+            <span class="example-total-label">Total</span>
+            <span class="example-total-pts">24 / 100</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-label">Augusta Labs · Confidencial · Banco BiG UC1: AI Score</div>
+    <div class="footer-label">Junho 2026</div>
+  </div>
+
+</div>
+</body>
+</html>
