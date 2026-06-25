@@ -3,15 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <title>AI Score — Definição e Metodologia</title>
-<script>
-(function(){
-  var k = sessionStorage.getItem('aok');
-  if(k !== '1'){
-    var p = prompt('Password:');
-    if(p !== 'gamboa1234'){ document.addEventListener('DOMContentLoaded', function(){ document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#888;">Acesso negado.</div>'; }); }
-    else { sessionStorage.setItem('aok','1'); }
+<style>
+  #gate-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #F2F2F2;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Inter', sans-serif;
   }
-})();
+  #gate-card {
+    background: #fff; border-radius: 14px; padding: 36px 32px 28px;
+    width: 340px; box-shadow: 0 2px 24px rgba(0,0,0,0.08);
+    display: flex; flex-direction: column; gap: 0;
+  }
+  #gate-confidential {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: #F97316; margin-bottom: 14px;
+  }
+  #gate-title {
+    font-family: 'Inter Tight', sans-serif; font-size: 22px;
+    font-weight: 700; color: #0A0A0A; line-height: 1.2; margin-bottom: 10px;
+  }
+  #gate-desc {
+    font-size: 13px; color: #6B6B6B; line-height: 1.5; margin-bottom: 22px;
+  }
+  #gate-input {
+    width: 100%; padding: 11px 14px; font-size: 14px; font-family: 'Inter', sans-serif;
+    border: 1.5px solid #E0E0E0; border-radius: 8px; outline: none;
+    color: #0A0A0A; background: #fff; margin-bottom: 10px;
+    transition: border-color 0.15s;
+  }
+  #gate-input:focus { border-color: #F97316; }
+  #gate-input.error { border-color: #EF4444; }
+  #gate-btn {
+    width: 100%; padding: 12px; font-size: 14px; font-weight: 600;
+    font-family: 'Inter', sans-serif; background: #0A0A0A; color: #fff;
+    border: none; border-radius: 8px; cursor: pointer; transition: opacity 0.15s;
+  }
+  #gate-btn:hover { opacity: 0.85; }
+  #gate-footer {
+    margin-top: 22px; font-size: 10px; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: #C0C0C0; text-align: center;
+  }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  if(sessionStorage.getItem('aok') === '1'){ return; }
+  var overlay = document.createElement('div'); overlay.id = 'gate-overlay';
+  overlay.innerHTML = '<div id="gate-card">'
+    + '<div id="gate-confidential">Confidential</div>'
+    + '<div id="gate-title">Augusta × Banco BiG<br>AI Score</div>'
+    + '<div id="gate-desc">This document is password protected. Enter the password to view.</div>'
+    + '<input id="gate-input" type="password" placeholder="Password" autocomplete="off"/>'
+    + '<button id="gate-btn">Unlock</button>'
+    + '<div id="gate-footer">Augusta Labs · Banco BiG</div>'
+    + '</div>';
+  document.body.prepend(overlay);
+  function unlock(){
+    var v = document.getElementById('gate-input').value;
+    if(v === 'gamboa1234'){
+      sessionStorage.setItem('aok','1');
+      document.getElementById('gate-overlay').remove();
+    } else {
+      var inp = document.getElementById('gate-input');
+      inp.classList.add('error'); inp.value = ''; inp.placeholder = 'Password incorrecta';
+      setTimeout(function(){ inp.classList.remove('error'); inp.placeholder = 'Password'; }, 1500);
+    }
+  }
+  document.getElementById('gate-btn').addEventListener('click', unlock);
+  document.getElementById('gate-input').addEventListener('keydown', function(e){ if(e.key==='Enter') unlock(); });
+});
 </script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700&family=Inter:wght@400;500&display=swap');
