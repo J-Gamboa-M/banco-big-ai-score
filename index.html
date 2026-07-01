@@ -303,6 +303,55 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
   </div>
 
+  <!-- 03b: OVERLAY FLAG -->
+  <div style="margin-top:16px;">
+    <div class="section-eyebrow" style="margin-bottom:8px;">03b · Flag Prioritário — Dados de Questionário</div>
+    <div style="background:#FAFAFA; border:1px solid #EAEAEA; border-radius:8px; padding:12px 14px;">
+      <p style="font-size:8px; color:#8A8A8A; margin:0 0 10px 0; line-height:1.6;">Independente do score numérico. Quando preenchido, activa um flag de <strong style="color:#F97316;">contacto prioritário</strong> que se sobrepõe à pontuação — independentemente do AI Score calculado pelas matrizes.</p>
+      <table class="mtx" style="font-size:8.5px;">
+        <thead><tr>
+          <th class="mtx-row" style="font-size:8px;">Ativos \ Poupança</th>
+          <th style="font-size:8px;">&gt;€5.000/mês</th>
+          <th style="font-size:8px;">€2.500–5.000/mês</th>
+          <th style="font-size:8px;">€500–2.500/mês</th>
+          <th class="nd-th" style="font-size:8px;">n/d</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td class="mtx-row">&gt;€500.000</td>
+            <td style="background:#F97316; color:#FFFFFF; font-weight:700; text-align:center; font-size:8px; padding:5px 4px;">Contactar</td>
+            <td style="color:#D0D0D0; text-align:center;">—</td>
+            <td style="color:#D0D0D0; text-align:center;">—</td>
+            <td class="nd">—</td>
+          </tr>
+          <tr>
+            <td class="mtx-row">€250–500k</td>
+            <td style="color:#D0D0D0; text-align:center;">—</td>
+            <td style="color:#D0D0D0; text-align:center;">—</td>
+            <td style="color:#D0D0D0; text-align:center;">—</td>
+            <td class="nd">—</td>
+          </tr>
+          <tr>
+            <td class="mtx-row">€50–250k</td>
+            <td style="color:#D0D0D0; text-align:center;">—</td>
+            <td style="color:#D0D0D0; text-align:center;">—</td>
+            <td style="color:#D0D0D0; text-align:center;">—</td>
+            <td class="nd">—</td>
+          </tr>
+          <tr>
+            <td class="mtx-row">€0–50k</td>
+            <td style="color:#D0D0D0; text-align:center;">—</td>
+            <td style="color:#D0D0D0; text-align:center;">—</td>
+            <td style="color:#D0D0D0; text-align:center;">—</td>
+            <td class="nd">—</td>
+          </tr>
+          <tr><td class="mtx-row nd-row">n/d</td><td class="nd">—</td><td class="nd">—</td><td class="nd">—</td><td class="nd">—</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:7.5px; color:#C0C0C0; margin:8px 0 0 0; font-style:italic;">Cobertura actual: ~0,08% da base. Dados auto-declarados via questionário — não entram no score numérico.</p>
+    </div>
+  </div>
+
   <!-- 04: MATRIZES -->
   <div>
     <div class="section-eyebrow">04 · As 6 Matrizes — 80 pts · Coluna e linha n/d em cada matriz</div>
@@ -370,8 +419,8 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="chart-header"><span class="chart-dim">Vol. Transf. Anual × Corretoras</span><span class="chart-max">máx 15 pts</span></div>
         <table class="mtx">
           <thead><tr>
-            <th class="mtx-row">Vol. Anual \ Corret.</th>
-            <th>&gt;50k</th><th>10–50k</th><th>0–10k</th><th class="nd-th">n/d</th>
+            <th class="mtx-row">Vol. Anual \ Nº Corret.</th>
+            <th>&gt;3</th><th>2–3</th><th>1</th><th class="nd-th">n/d</th>
           </tr></thead>
           <tbody>
             <tr><td class="mtx-row">&gt;€200.000/ano</td><td style="background:#0A0A0A;color:#F5F5F5">15</td><td style="background:#2A2A2A;color:#F5F5F5">13</td><td style="background:#6E6E6E;color:#F5F5F5">11</td><td class="nd">11</td></tr>
@@ -443,8 +492,8 @@ document.addEventListener('DOMContentLoaded', function(){
       </div>
 
       <div style="background:#FAFAFA; border:1px solid #EAEAEA; border-radius:6px; padding:8px 10px;">
-        <div style="font-family:'Inter Tight',sans-serif; font-size:9px; font-weight:700; color:#0A0A0A; margin-bottom:3px;">Vol. Transf. Anual × Corretoras</div>
-        <p style="font-size:8px; color:#6E6E6E; margin:0; line-height:1.6;">O volume indica a dimensão da actividade financeira. O número de corretoras indica dispersão — quanto mais corretoras, maior a probabilidade de o BiG ser apenas um entre vários. A combinação distingue clientes fiéis de clientes dispersos.</p>
+        <div style="font-family:'Inter Tight',sans-serif; font-size:9px; font-weight:700; color:#0A0A0A; margin-bottom:3px;">Vol. Transf. Anual × Nº Corretoras</div>
+        <p style="font-size:8px; color:#6E6E6E; margin:0; line-height:1.6;">O volume total transferido indica a dimensão da actividade financeira do cliente fora do BiG. O número de corretoras indica para quantas instituições diferentes envia dinheiro — mais corretoras e maior volume significa um investidor activo com activos dispersos por concorrentes: alta oportunidade de captura.</p>
       </div>
 
       <div style="background:#FAFAFA; border:1px solid #EAEAEA; border-radius:6px; padding:8px 10px;">
@@ -479,11 +528,11 @@ document.addEventListener('DOMContentLoaded', function(){
           <!-- score on tallest -->
           <text x="172" y="17" font-family="Inter" font-size="7" fill="#FFFFFF" text-anchor="middle">10</text>
           <!-- x labels -->
-          <text x="20"  y="95" font-family="Inter" font-size="6" fill="#8A8A8A" text-anchor="middle">0–250k</text>
-          <text x="58"  y="95" font-family="Inter" font-size="6" fill="#8A8A8A" text-anchor="middle">250–500k</text>
-          <text x="96"  y="95" font-family="Inter" font-size="6" fill="#8A8A8A" text-anchor="middle">500k–1M</text>
-          <text x="134" y="95" font-family="Inter" font-size="6" fill="#8A8A8A" text-anchor="middle">1M–2M</text>
-          <text x="172" y="95" font-family="Inter" font-size="6" fill="#8A8A8A" text-anchor="middle">&gt;2M</text>
+          <text x="20"  y="95" font-family="Inter" font-size="6" fill="#8A8A8A" text-anchor="middle">0–50k</text>
+          <text x="58"  y="95" font-family="Inter" font-size="6" fill="#8A8A8A" text-anchor="middle">50–250k</text>
+          <text x="96"  y="95" font-family="Inter" font-size="6" fill="#8A8A8A" text-anchor="middle">250–500k</text>
+          <text x="134" y="95" font-family="Inter" font-size="6" fill="#8A8A8A" text-anchor="middle">500k–1M</text>
+          <text x="172" y="95" font-family="Inter" font-size="6" fill="#8A8A8A" text-anchor="middle">&gt;1M</text>
         </svg>
       </div>
 
